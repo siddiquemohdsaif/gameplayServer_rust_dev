@@ -1,0 +1,3 @@
+@echo off
+echo Connecting to mm-sr-1...
+ssh root@134.209.159.66

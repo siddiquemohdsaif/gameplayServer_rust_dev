@@ -1,0 +1,6 @@
+for /r %f in (*.cpp) do g++ -c "%f" -o "%~dpnf.o"
+
+g++ "E:\Node Project\_Carrom_\CPhysic\ConstantsCarrom.o" "E:\Node Project\_Carrom_\CPhysic\ConstantsStriker.o" "E:\Node Project\_Carrom_\CPhysic\main.o" "E:\Node Project\_Carrom_\CPhysic\SimulationMain.o" "E:\Node Project\_Carrom_\CPhysic\Simulator.o" "E:\Node Project\_Carrom_\CPhysic\Maths\Utils.o" "E:\Node Project\_Carrom_\CPhysic\Maths\Vector3.o" "E:\Node Project\_Carrom_\CPhysic\Model\Ball.o" "E:\Node Project\_Carrom_\CPhysic\Model\Outcome.o" "E:\Node Project\_Carrom_\CPhysic\Model\Pocket.o" "E:\Node Project\_Carrom_\CPhysic\Model\Table.o" "E:\Node Project\_Carrom_\CPhysic\Model\TableGeometry.o" "E:\Node Project\_Carrom_\CPhysic\Util\Collision.o" "E:\Node Project\_Carrom_\CPhysic\Util\Cushion.o" "E:\Node Project\_Carrom_\CPhysic\Util\Physics.o" -o "E:\Node Project\_Carrom_\CPhysic\CarromSimulation.exe"
+
+
+"E:\Node Project\_Carrom_\CPhysic\CarromSimulation.exe"  

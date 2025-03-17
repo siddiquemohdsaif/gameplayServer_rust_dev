@@ -1,0 +1,27 @@
+If you prefer to manually perform the apt upgrade and clean activities on a monthly or bi-monthly basis, you can disable the automatic execution of the apt-daily-upgrade.service and apt-daily.service units by running the following commands:
+
+
+sudo systemctl stop apt-daily.service
+sudo systemctl stop apt-daily-upgrade.service
+sudo systemctl disable apt-daily.service
+sudo systemctl disable apt-daily-upgrade.service
+
+sudo systemctl stop apt-daily.timer
+sudo systemctl stop apt-daily-upgrade.timer
+sudo systemctl disable apt-daily.timer
+sudo systemctl disable apt-daily-upgrade.timer
+
+
+These commands will stop and disable the two units responsible for the daily upgrade and clean activities. You can then run these commands manually when you want to perform the upgrades and cleaning:
+
+
+
+
+
+
+sudo apt update
+sudo apt upgrade
+sudo apt autoremove
+
+
+The apt update command will update the package lists, apt upgrade will install any available upgrades, and apt autoremove will remove any unnecessary packages that were installed as dependencies but are no longer needed.

@@ -1,0 +1,62 @@
+
+# Prequest (Prerequisites):
+
+1. Update Package Lists:
+   Command: sudo apt update
+   Description: Updates the list of available packages and their versions.
+
+2. Install Java JDK and G++:
+   Command: sudo apt install openjdk-17-jdk g++
+   Description: Installs OpenJDK 17 and the GNU C++ compiler.
+
+
+
+
+# For Initialization:
+
+1. Move Service File:
+   Command: cd /rust/GamePlayServerNode/springBootServer/simulator-api/release/ , sudo mv simular-api.service /etc/systemd/system/
+   Description: Moves the custom service file to the systemd system services directory.
+
+2. Reload Systemd Daemon:
+   Command: sudo systemctl daemon-reload
+   Description: Reloads systemd configuration.
+
+3. Enable Service:
+   Command: sudo systemctl enable simular-api.service
+   Description: Enables the service to start automatically at boot.
+
+4. Start Service:
+   Command: sudo systemctl start simular-api.service
+   Description: Starts the service immediately.
+
+5. Check Service Status:
+   Command: sudo systemctl status simular-api.service
+   Description: Displays the current status of the service.
+
+
+
+
+
+# For Reload:
+
+1. Restart Service:
+   Command: sudo systemctl restart simular-api.service
+   Description: Restarts the service.
+
+2. Check Service Status (Again):
+   Command: sudo systemctl status simular-api.service
+   Description: Checks the status of the service post-restart.
+
+
+# For log :
+
+1. sudo journalctl -u simular-api.service -n 100
+
+
+
+# For log clear :
+
+1. sudo journalctl --rotate
+
+2. sudo journalctl --vacuum-time=1s

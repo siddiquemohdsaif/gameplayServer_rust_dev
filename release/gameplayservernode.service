@@ -1,0 +1,15 @@
+[Unit]
+Description=Game Server Node Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/rust/GamePlayServerNode/release/GamePlayServerNode
+WorkingDirectory=/rust/GamePlayServerNode/release
+Restart=on-failure
+RestartSec=5
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,29 @@
+1) install rust :: optional(for local build) =>
+  sudo apt update
+  sudo apt install curl
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+  source $HOME/.cargo/env
+  echo "export PATH=\$HOME/.cargo/bin:\$PATH" >> ~/.bashrc
+  source ~/.bashrc
+  sudo apt install build-essential
+  rustc --version
+
+2) create folder /rust/GamePlayServerNode
+   FileZilla : copy src, Cargo.loc, Cargo.toml
+   release build : cargo build --release
+   
+   tempRun : chmod +x release/GamePlayServerNode  
+         ./release/GamePlayServerNode
+   
+   finalRun: chmod +x release/GamePlayServerNode 
+             sudo nano /etc/systemd/system/gameplayservernode.service  => paste content
+             sudo systemctl daemon-reload
+             sudo systemctl start gameplayservernode.service
+             sudo systemctl enable gameplayservernode.service
+             sudo systemctl status gameplayservernode.service
+
+  
+  restartRun : chmod +x release/GamePlayServerNode 
+               sudo systemctl daemon-reload
+               sudo systemctl restart gameplayservernode.service
+               sudo systemctl status gameplayservernode.service

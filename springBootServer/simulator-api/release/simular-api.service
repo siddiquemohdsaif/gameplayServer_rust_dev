@@ -1,0 +1,17 @@
+[Unit]
+Description=My Spring Boot Application
+After=syslog.target
+
+[Service]
+User=root
+# Ensure the working directory is set correctly
+WorkingDirectory=/rust/GamePlayServerNode/springBootServer/simulator-api/release/
+ExecStart=/usr/bin/java -jar simulator-api-0.0.1-SNAPSHOT.jar
+SuccessExitStatus=143
+
+# Restart service on failure after a 30-second delay
+Restart=on-failure
+RestartSec=30s
+
+[Install]
+WantedBy=multi-user.target
