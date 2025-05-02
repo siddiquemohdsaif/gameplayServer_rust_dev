@@ -1,4 +1,5 @@
 {
-    "appUrl": "https://carrom-clash-9t32.cloudsw3.com",
+    "appUrl": "https://carrom-clash-9t32.cloudsw3.com/rest-api/",
+    "appUrl_dev": "https://carrom-clash-dev-ei4u.cloudsw3.com/rest-api/",
     "authorizationToken": "a6MjKPcgU9XhLR1N"
 }

@@ -246,6 +246,7 @@ impl MyWebSocket {
             },
             "gameEvent" => {
                 if message_received.event.is_some() {
+                    // println!("complete_simulation_end_event , uid:{}", self.uid.clone().unwrap());
                     game_event::handle_game_event(message_received.event.unwrap(), self.gameID.clone(), self.uid.clone().unwrap());
                 }
             },

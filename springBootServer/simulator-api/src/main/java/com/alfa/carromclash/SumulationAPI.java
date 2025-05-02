@@ -4,6 +4,12 @@ import com.alfa.carromclash.GameEngine.Core.GameState;
 import com.alfa.carromclash.GameEngine.Core.Simulator;
 import com.alfa.carromclash.GameEngine.Core.StrikerStatic;
 import com.alfa.carromclash.GameEngine.Core.TwoPlayerGame;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.alfa.carromclash.GameEngine.Core.Carrom;
 import com.alfa.carromclash.GameEngine.Core.GameManager2player.Player;
 import com.alfa.carromclash.GameEngine.Core.TwoPlayerGame.Result;
 import com.alfa.carromclash.GameEngine.Core.SimulatorEvent;
@@ -25,7 +31,31 @@ public class SumulationAPI {
         TwoPlayerGame twoPlayerGame = new TwoPlayerGame(gameState , simulatorEvent);
         Result result =  twoPlayerGame.evaluateSimulation(simulator);
 
-        return Result.toJsonString(result);
+
+        
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("balls_history_x", simulator.coinPositionsHistory_x);
+        jsonObject.put("balls_history_y", simulator.coinPositionsHistory_y);
+
+
+        JSONArray carromsJsonArray = new JSONArray();
+        for (Carrom carrom : simulator.coinsContainer.carroms) {
+            JSONObject carromJsonObject = new JSONObject();
+            try {
+                carromJsonObject.put("carrom_drawable_id", carrom.carrom_drawable_id);
+                carromJsonObject.put("coinCode", carrom.coinCode);
+                carromJsonObject.put("type", carrom.type.toString());
+                carromJsonObject.put("x", carrom.x);
+                carromJsonObject.put("y", carrom.y);
+                carromJsonObject.put("isPotted", carrom.isPotted);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            carromsJsonArray.put(carromJsonObject);
+        }
+        jsonObject.put("carroms", carromsJsonArray);
+
+        return Result.toJsonString(result) + jsonObject.toString();
     }
     
 }

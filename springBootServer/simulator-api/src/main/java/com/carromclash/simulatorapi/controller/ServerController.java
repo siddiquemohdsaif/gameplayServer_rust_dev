@@ -1,5 +1,6 @@
 package com.carromclash.simulatorapi.controller;
 
+import org.json.JSONObject;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alfa.carromclash.NativeBridge;
 import com.alfa.carromclash.SumulationAPI;
+import com.alfa.carromclash.GameEngine.Core.Simulator;
 
 @RestController
 public class ServerController {
@@ -30,7 +32,17 @@ public class ServerController {
 
         try{
             
-           return SumulationAPI.getSimulation(gameStateSting, simulatorEventString);
+        //    return SumulationAPI.getSimulation(gameStateSting, simulatorEventString) + "hii";
+
+        String r = SumulationAPI.getSimulation(gameStateSting, simulatorEventString);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("posX", Simulator.posX);
+        jsonObject.put("posY", Simulator.posY);
+        jsonObject.put("pointer", Simulator.pointer);
+
+
+        return r + jsonObject.toString();
 
         }catch(Exception e){
             return e.toString();

@@ -7,6 +7,8 @@ import com.alfa.carromclash.GameEngine.Core.Physic.Engine.V1.Vector3;
 import com.alfa.carromclash.NativeBridge;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Simulator {
 
@@ -24,8 +26,15 @@ public class Simulator {
     public double strikerRotationAngleInDegree = 0;
     public long lastTime;
     public CoinsContainer coinsContainer;
+    public static double[] posX = new double[1000];
+    public static int pointer = 0;
+    public static double[] posY = new double[1000];
 
     
+    // Map to record positions of all coins including striker by their coinCode
+    public Map<Integer, ArrayList<Double>> coinPositionsHistory_x = new HashMap<>();
+    public Map<Integer, ArrayList<Double>> coinPositionsHistory_y = new HashMap<>();
+
     public Simulator(double px, double py, double vx, double vy, StrikerStatic strikerStatic) {
         this.px = px;
         this.py = py;
@@ -62,6 +71,8 @@ public class Simulator {
         this.coinsContainer = coinsContainer;
         isStimulationFinish = false;
 
+        // Initialize position recording
+        initializeCoinPositions(balls);
 
         lastTime = System.currentTimeMillis();
         NativeBridge.startSimulation(this);
@@ -69,6 +80,30 @@ public class Simulator {
 
         // SoundPlayerForGame.playStrikerReleaseSound();
     }
+
+    private void initializeCoinPositions(ArrayList<Ball> balls) {
+        for (Ball ball : balls) {
+            coinPositionsHistory_x.put(ball.coinCode, new ArrayList<>());
+            coinPositionsHistory_x.get(ball.coinCode).add(ball.pos.x);
+
+            coinPositionsHistory_y.put(ball.coinCode, new ArrayList<>());
+            coinPositionsHistory_y.get(ball.coinCode).add(ball.pos.y);
+        }
+    }
+
+
+    private void recordPosition(Ball ball) {
+        ArrayList<Double> positions_x = coinPositionsHistory_x.get(ball.coinCode);
+        if (positions_x != null) {
+            positions_x.add(ball.pos.x);
+        }
+
+        ArrayList<Double> positions_y = coinPositionsHistory_y.get(ball.coinCode);
+        if (positions_y != null) {
+            positions_y.add(ball.pos.y);
+        }
+    }
+    
 
     public void stimulateToCurrentTime(long currentTime) {
         if (isStimulationFinish){
@@ -109,6 +144,15 @@ public class Simulator {
             isStrikerPocketed = true;
         }
 
+        if (Simulator.pointer < 1000) {
+            posX[pointer] = strikerStatic.x;
+            posY[pointer] = strikerStatic.y;
+            pointer ++;
+        }
+
+        recordPosition(ball_striker);
+
+
         //rotation time ref
         long currentTime = System.currentTimeMillis();
         double deltaTime = (currentTime - lastTime) / 1000.0; // convert milliseconds to seconds
@@ -127,14 +171,20 @@ public class Simulator {
             carrom.x = ball.pos.x;
             carrom.y = ball.pos.y;
             carrom.depth = ball.pos.z;
+
             if (ball.pocket){
                 carrom.isInPocket = new Carrom.Pocket(true,System.currentTimeMillis());
             }
+
+            recordPosition(ball);
+
+
             angularVelocityDegreesPerSecond = Math.toDegrees(ball.rvel.z);
             amplification = 360 * Math.sqrt(ball.vel.x*ball.vel.x + ball.vel.y*ball.vel.y);
             deltaAngle = angularVelocityDegreesPerSecond * deltaTime * amplification;
             carrom.rotationAngleInDegree += deltaAngle;
             carrom.rotationAngleInDegree = (carrom.rotationAngleInDegree + 360) % 360;
+
         }
 
     }

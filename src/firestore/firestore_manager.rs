@@ -1,7 +1,26 @@
 use reqwest::{Client, ClientBuilder, header::{HeaderMap, HeaderName, HeaderValue}};
 use serde_json::{json, Value};
+use serde::Deserialize;
 use std::sync::Once;
 use crate::firestore::validator::{validate_collection_name, validate_document_name};
+
+
+#[derive(Debug, Deserialize)]
+struct CloudSw3Config {
+    #[serde(rename = "appUrl")]
+    app_url: String,
+    #[serde(rename = "appUrl_dev")]
+    app_url_dev: String,
+    #[serde(rename = "authorizationToken")]
+    authorization_token: String,
+}
+
+
+#[derive(Debug, Deserialize)]
+struct EnvConfig {
+    #[serde(rename = "PRODUCTION_TYPE")]
+    production_type: String
+}
 
 #[derive(Debug)]
 pub struct FirestoreManager {
@@ -11,18 +30,42 @@ pub struct FirestoreManager {
 
 static mut INSTANCE: Option<FirestoreManager> = None;
 static INIT: Once = Once::new();
+const CONFIG_JSON: &str = include_str!("config-cloudsw3.json");
+const ENV_CONFIG_JSON: &str = include_str!("../env_config.json");
 
-const APP_URL: &str = "https://carrom-clash-9t32.cloudsw3.com/rest-api/";
-const AUTHORIZATION_TOKEN: &str = "a6MjKPcgU9XhLR1N";
+
+// const APP_URL: &str = "https://carrom-clash-9t32.cloudsw3.com/rest-api/";
+// const AUTHORIZATION_TOKEN: &str = "a6MjKPcgU9XhLR1N";
+
+
+fn load_config() -> CloudSw3Config {
+    serde_json::from_str::<CloudSw3Config>(CONFIG_JSON)
+        .unwrap_or_else(|e| panic!("Invalid embedded JSON config: {}", e))
+}
+
+fn load_env_config() -> EnvConfig {
+    serde_json::from_str::<EnvConfig>(ENV_CONFIG_JSON)
+        .unwrap_or_else(|e| panic!("Invalid embedded JSON config: {}", e))
+}
 
 impl FirestoreManager {
     pub fn get_instance() -> &'static FirestoreManager {
         unsafe {
             INIT.call_once(|| {
+                let cfg = load_config();
+                let env_cfg = load_env_config();
+
+                let authorization_token = cfg.authorization_token;
+                let app_url = if env_cfg.production_type == "release" {
+                    cfg.app_url
+                }else{
+                    cfg.app_url_dev
+                };
+
                 let mut headers = HeaderMap::new();
                 headers.insert(
                     HeaderName::from_static("authorization"),
-                    HeaderValue::from_str(&format!("Bearer {}", AUTHORIZATION_TOKEN)).unwrap(),
+                    HeaderValue::from_str(&format!("Bearer {}", authorization_token)).unwrap(),
                 );
 
                 let client = ClientBuilder::new()
@@ -32,7 +75,7 @@ impl FirestoreManager {
 
                 let instance = FirestoreManager {
                     client,
-                    base_url: APP_URL.to_string(),
+                    base_url: app_url,
                 };
                 INSTANCE = Some(instance);
             });

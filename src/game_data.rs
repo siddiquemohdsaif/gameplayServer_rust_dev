@@ -40,7 +40,7 @@ impl GameData {
 }
 
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Game {
     pub game_id: String,
 
@@ -90,7 +90,7 @@ pub enum State {
     END,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct PreviousGameState {
     pub state: String,
     pub update_count: i32,
@@ -98,7 +98,7 @@ pub struct PreviousGameState {
     pub at: i64,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct GameStateHistory {
     pub id: String,
     pub game_state: String,
@@ -402,6 +402,7 @@ impl Game {
     }
 
     fn resume_game(&mut self, uid: String){
+        println!("resume_game , uid:{}", uid);
 
         self.state = State::ON;
         self.sockets_exchange();
@@ -480,15 +481,18 @@ impl Game {
                         return true;
                     }
 
-                    //game previous state check
-                    if game.previous_game_state.is_some() {
+                    // //game previous state check
+                    // if game.previous_game_state.is_some() {
+                    //     println!("process_game 1, game_id:{}", game_id);
 
-                        let previous_game_state = game.previous_game_state.clone().unwrap();
-                        if previous_game_state.at + 3000 < now && game.cst + 1000 < now {
-                            game_event::complete_simulation_end_event(&game, game.uid_1.clone());
-                        }
+                    //     let previous_game_state = game.previous_game_state.clone().unwrap();
+                    //     if previous_game_state.at + 3000 < now && game.cst + 1000 < now {
+                    //         println!("process_game 2, game_id:{:?}", game);
+
+                    //         game_event::complete_simulation_end_event(&game, game.uid_1.clone());
+                    //     }
                         
-                    }
+                    // }
 
                     //game disconnect count check
                     if game.p1_disconnect_count  >= 5 {

@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/rust/GamePlayServerNode/release/GamePlayServerNode
-WorkingDirectory=/rust/GamePlayServerNode/release
+ExecStart=/rust/GamePlayServerNode_dev/release/GamePlayServerNode_dev
+WorkingDirectory=/rust/GamePlayServerNode_dev/release
 Restart=on-failure
 RestartSec=5
 StartLimitIntervalSec=60

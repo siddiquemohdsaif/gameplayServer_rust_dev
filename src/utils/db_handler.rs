@@ -27,7 +27,7 @@ async fn create_reconnect_link(uid1: &String, uid2: &String, game_id: &String, i
 }
 async fn deduct_coin_by_api_call(uid1: &String, uid2: &String, map: i32) -> Result<(), Box<dyn Error>> {
     let client = Client::new();
-    let response = client.post("https://function.cloudsw3.com/cc-app-api/gamePlayServer/game-start")
+    let response = client.post("https://function.cloudsw3.com/cc-app-api_dev/gamePlayServer/game-start")
         .json(&json!({"UID1": uid1, "UID2": uid2, "map": map}))
         .send()
         .await?;
@@ -153,7 +153,7 @@ async fn game_over_event_handle(uid1: String, uid2: String, map: i32, winner: i3
         });
 
         let client = Client::new();
-        let response = client.post("https://function.cloudsw3.com/cc-app-api/gamePlayServer/game-over")
+        let response = client.post("https://function.cloudsw3.com/cc-app-api_dev/gamePlayServer/game-over")
             .json(&data)
             .send()
             .await?;

@@ -21,6 +21,9 @@ pub fn handle_game_event(game_event_str: String, game_id: String, uid: String) {
         turn: None,
     });
 
+    // println!("handle_game_event:{} , uid:{}",game_event.eventType, uid);
+
+
     let mut game_data = game_data::GAME_DATA.lock().unwrap();
 
     if let Some(mut game) = game_data.games.remove(&game_id) {
@@ -72,6 +75,8 @@ pub fn handle_game_event(game_event_str: String, game_id: String, uid: String) {
 
 
 pub fn complete_simulation_end_event(game: &Game, uid: String){
+    // println!("complete_simulation_end_event , uid:{}", uid);
+
     if game.previous_game_state.is_some() && game.previous_game_state.clone().unwrap().update_count == 1 {
         let simulation_end_event = game.previous_game_state.clone().unwrap().game_event;
         let game_id = game.game_id.clone();
@@ -83,6 +88,8 @@ pub fn complete_simulation_end_event(game: &Game, uid: String){
 
 
 pub fn fire_pending_events(game: &mut Game, uid: String){
+    // println!("fire_pending_events , uid:{}", uid);
+
     let pending_fire_game_event = game.pending_fire_game_event.clone();
     let game_id =  game.game_id.clone();
     game.pending_fire_game_event.clear();
@@ -166,6 +173,7 @@ fn update_game_state(game_event: GameEvent, game: &mut Game, game_event_str: Str
 }
 
 fn investigate_hack_via_simulation(game_event: GameEvent, game: &mut Game){
+    // println!("investigate_hack_via_simulation:");
 
     let previous_state = game.previous_game_state.clone();
     let current_simulation = game.current_simulation.clone();
@@ -173,6 +181,8 @@ fn investigate_hack_via_simulation(game_event: GameEvent, game: &mut Game){
     let game_id = game.game_id.clone();
 
     tokio::spawn(async move {
+        // println!("investigate_hack_via_simulation spawn:");
+
         let final_game_state: String = if previous_state.is_some() && current_simulation.is_some() {
             let simulation_game_state = simulator_validator::do_simulation_validation(previous_state.unwrap(), current_simulation.unwrap()).await;
             let simulation_game_state = match simulation_game_state {
@@ -196,6 +206,8 @@ fn investigate_hack_via_simulation(game_event: GameEvent, game: &mut Game){
                     game.game_state = final_game_state; 
                 }
 
+                // println!("investigate_hack_via_simulation update_game_state_action:");
+                game.previous_game_state.as_mut().unwrap().update_count = 2;
                 update_game_state_action(game_event, &mut game, true);
                 
 
@@ -237,6 +249,9 @@ fn update_game_state_action(game_event: GameEvent, game: &mut Game, forced_state
     match game_event.eventAction.unwrap_or_default().as_str() {
         
         "turnChange" => {
+
+            // println!("update_game_state_action turnChange :{}",forced_state_change);
+
             let turn = game_event.turn.unwrap();
             let message = if forced_state_change {
                 serde_json::to_string(&json!({ "type": "turnChange", "turn": turn, "changeState": game.game_state.clone() })).unwrap()
@@ -306,6 +321,7 @@ fn handle_time_out(game_event: GameEvent, game: &mut Game, game_event_str: Strin
 
         "1" => { // opponent call means main player not responde timely
             let turn = game_event.turn.unwrap();
+            // println!("handle_time_out turnChange :{}",turn);
             let message = serde_json::to_string(&json!({ "type": "turnChange", "turn": turn, "changeState": game.game_state.clone() })).unwrap();
             game.cst = Utc::now().timestamp_millis();
             game.ttp = 0;
