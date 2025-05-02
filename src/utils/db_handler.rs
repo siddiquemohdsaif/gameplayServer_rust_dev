@@ -6,6 +6,18 @@ use serde_json::json;
 use crate::{firestore::firestore_manager::FirestoreManager, game_data::GameStateHistory, utils::{backbone_server_url::BackboneServerUrl, websocket_http_client::WebSocketHttpClient}};
 
 
+const ENV_CONFIG_JSON: &str = include_str!("../env_config.json");
+
+#[derive(Debug, Deserialize)]
+struct EnvConfig {
+    #[serde(rename = "PRODUCTION_TYPE")]
+    production_type: String
+}
+
+fn load_env_config() -> EnvConfig {
+    serde_json::from_str::<EnvConfig>(ENV_CONFIG_JSON)
+        .unwrap_or_else(|e| panic!("Invalid embedded JSON config: {}", e))
+}
 
 // on game-start
 async fn create_reconnect_link(uid1: &String, uid2: &String, game_id: &String, ip: &String) -> Result<(), Box<dyn Error>> {
@@ -26,8 +38,16 @@ async fn create_reconnect_link(uid1: &String, uid2: &String, game_id: &String, i
 
 }
 async fn deduct_coin_by_api_call(uid1: &String, uid2: &String, map: i32) -> Result<(), Box<dyn Error>> {
+    
+    let env_config = load_env_config();
+    let base_api = if env_config.production_type == "release" {
+        "https://function.cloudsw3.com/cc-app-api"
+    } else {
+        "https://function.cloudsw3.com/cc-app-api_dev"
+    };
+    
     let client = Client::new();
-    let response = client.post("https://function.cloudsw3.com/cc-app-api_dev/gamePlayServer/game-start")
+    let response = client.post(format!("{}/gamePlayServer/game-start", base_api))
         .json(&json!({"UID1": uid1, "UID2": uid2, "map": map}))
         .send()
         .await?;
@@ -131,6 +151,14 @@ async fn game_over_event_handle(uid1: String, uid2: String, map: i32, winner: i3
     delete_reconnect_link(&uid1, &uid2).await;
     let _ = upload_game_state_history(game_id, game_state_history).await;
 
+
+    let env_config = load_env_config();
+    let base_api = if env_config.production_type == "release" {
+        "https://function.cloudsw3.com/cc-app-api"
+    } else {
+        "https://function.cloudsw3.com/cc-app-api_dev"
+    };
+
     if map == -1 {
         send_friendly_battle_result_to_bbs(&uid1, &uid2, winner).await;
     } else {
@@ -153,7 +181,7 @@ async fn game_over_event_handle(uid1: String, uid2: String, map: i32, winner: i3
         });
 
         let client = Client::new();
-        let response = client.post("https://function.cloudsw3.com/cc-app-api_dev/gamePlayServer/game-over")
+        let response = client.post(format!("{}/gamePlayServer/game-over", base_api))
             .json(&data)
             .send()
             .await?;
